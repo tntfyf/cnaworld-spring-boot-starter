@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -91,32 +90,49 @@ public class CnaCommonUrlUtil {
 
 	/**
 	 * 获取第三方公共地址
+	 * 匹配不到抛出运行时异常
 	 * @param hostName 地址名称
 	 * @return 完整地址
 	 */
 	public static String getCommonUrl(String hostName) {
-		return  getCommonUrl(hostName, null, localCachedMap);
+		return  getCommonUrl(hostName, null,false);
 	}
 
 	/**
 	 * 获取第三方公共地址
+	 * 匹配不到抛出运行时异常
 	 * @param hostName 地址名称
 	 * @param pathName 路径名称
 	 * @return 完整地址
 	 */
 	public static String getCommonUrl(String hostName, String pathName) {
-		return  getCommonUrl(hostName, pathName, localCachedMap);
+		return  getCommonUrl(hostName, pathName,false);
+	}
+
+
+	/**
+	 * 获取第三方公共地址
+	 * @param hostName 地址名称
+	 * @param alwaysReturn true：匹配不到返回null false：匹配不到抛出运行时异常
+	 * @return 完整地址
+	 */
+	public static String getCommonUrl(String hostName , boolean alwaysReturn) {
+		return  getCommonUrl(hostName, null,alwaysReturn);
 	}
 
 	/**
 	 * 获取第三方公共地址
 	 * @param hostName 地址名称
 	 * @param pathName 路径名称
+	 * @param alwaysReturn true：匹配不到返回null false：匹配不到抛出运行时异常
 	 * @return 完整地址
 	 */
-	private static String getCommonUrl(String hostName, String pathName,Map<String , String> localCachedMap) {
+	public static String getCommonUrl(String hostName, String pathName,boolean alwaysReturn) {
 
-		Assert.hasText(hostName,"hostName 不能为空！");
+		if (StringUtils.isBlank(hostName)) {
+			return handleReturn("hostName 不能为空" , alwaysReturn);
+		}
+
         String key = hostName + pathName;
 		if(ObjectUtils.isNotEmpty(localCachedMap)){
 			if (localCachedMap.containsKey(key)) {
@@ -126,10 +142,8 @@ public class CnaCommonUrlUtil {
 
 		Map<String, CnaworldCommonUrlProperties.HostEntity> hostEntityMap = commonUrlProperties.getHostName();
 		if(hostEntityMap == null){
-			CnaLogUtil.error(log,"请检查 cnaworld.common-url.host-name 地址配置");
-			throw new RuntimeException("请检查 cnaworld.common-url.host-name 地址配置");
+			return handleReturn("请检查 cnaworld.common-url.host-name 地址配置" , alwaysReturn);
 		}
-
 		String urlkey;
 		if(hostEntityMap.containsKey(hostName)) {
 			StringBuilder urlBuffer=new StringBuilder();
@@ -146,29 +160,32 @@ public class CnaCommonUrlUtil {
 								urlkey=urlkey+pathName;
 								urlBuffer.append(path);
 							}else {
-								CnaLogUtil.error(log," path 配置为空 ：{}",path);
-								throw new RuntimeException(" path 配置为空 ：" + pathName);
+								return handleReturn(" path 配置为空 ：" + pathName, alwaysReturn);
 							}
 						}else{
-							CnaLogUtil.error(log,"未匹配到 path-name 配置 ：{}",pathName);
-							throw new RuntimeException("未匹配到 path-name 配置 ：" + pathName);
+							return handleReturn("未匹配到 path-name 配置 ：" + pathName, alwaysReturn);
 						}
 					}else {
-						CnaLogUtil.error(log,"请检查 cnaworld.common-url.host-name.path-name 地址配置");
-						throw new RuntimeException("请检查 cnaworld.common-url.host-name.path-name 地址配置");
+						return handleReturn("请检查 cnaworld.common-url.host-name.path-name 地址配置 : " + hostName, alwaysReturn);
 					}
 				}
 			}else {
-				CnaLogUtil.error(log," host 配置为空 ：{}",pathName);
-				throw new RuntimeException(" host 配置为空 ：" + hostName);
+				return handleReturn(" host 配置为空 ：" + hostName, alwaysReturn);
 			}
-
 			String urlValue = urlBuffer.toString();
 			localCachedMap.put(urlkey,urlValue);
 			return urlValue;
 		} else {
-			CnaLogUtil.error(log,"未匹配到 host-name 配置 ：{}",hostName);
-			throw new RuntimeException("未匹配到 host-name 配置 ：" + hostName );
+			return handleReturn("未匹配到 host-name 配置 ：" + hostName, alwaysReturn);
+		}
+	}
+
+	private static String handleReturn(String message, boolean alwaysReturn) {
+		if (!alwaysReturn) {
+			CnaLogUtil.error(log,message);
+			throw new RuntimeException(message);
+		}else {
+			return null;
 		}
 	}
 }

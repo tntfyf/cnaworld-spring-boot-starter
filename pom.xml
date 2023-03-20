@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.cnaworld.framework</groupId>
 	<artifactId>cnaworld-spring-boot-starter</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>cnaworld-spring-boot-starter</name>
 	<description>cnaworld-spring-boot-starter</description>
 	<url>https://github.com/tntfyf/cnaworld-spring-boot-starter</url>
