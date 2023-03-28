@@ -1,5 +1,5 @@
 # cnaworld spring boot starter 业务核心组件工具库
-## 1.0.1版本 
+## 1.0.2版本 
 
 作用：
 1. 集成mybatis-plus 、redis 、aop 、 log 组件库
