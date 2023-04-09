@@ -9,7 +9,10 @@ import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -25,7 +28,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import javax.net.ssl.SSLException;
 import java.net.*;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lucifer
@@ -46,9 +48,10 @@ public class NettyHttpClient {
         try {
             nettyHttpClientHold = initClientHold(url,paramsMap);
             CnaLogUtil.debug(log,"准备发送{}请求，url : {} , dto : {}, paramsMap : {} , headerMap : {}",restFulEntityType,url,dto,paramsMap,headerMap);
-            sendHttpRequest(nettyHttpClientHold,dto,headerMap,restFulEntityType);
+            Channel client = sendHttpRequest(nettyHttpClientHold,dto,headerMap,restFulEntityType);
             String response = getResponse(url, nettyHttpClientHold);
             CnaLogUtil.debug(log,"{}请求发送完毕，url : {} , paramsMap : {} , headerMap : {} , response : {}", restFulEntityType, url, paramsMap, headerMap,response);
+            client.close();
             return response;
         } catch (MalformedURLException | InterruptedException | URISyntaxException | UnknownHostException e) {
             CnaLogUtil.error(log,"CnaNettyHttpClientUtil 发送异常：{}",e.getMessage(),e);
@@ -61,9 +64,10 @@ public class NettyHttpClient {
         try {
             nettyHttpClientHold = initClientHold(url,paramsMap);
             CnaLogUtil.debug(log,"准备发送{}请求，url : {} , paramsMap : {} , headerMap : {}",restFulBaseType,url,paramsMap,headerMap);
-            sendHttpRequest(nettyHttpClientHold,headerMap,restFulBaseType);
+            Channel client = sendHttpRequest(nettyHttpClientHold,headerMap,restFulBaseType);
             String response = getResponse(url, nettyHttpClientHold);
             CnaLogUtil.debug(log,"{}请求发送完毕，url : {} , paramsMap : {} , headerMap : {} , response : {}", restFulBaseType, url, paramsMap, headerMap,response);
+            client.close();
             return response;
         } catch (MalformedURLException | InterruptedException | URISyntaxException | UnknownHostException e) {
             CnaLogUtil.error(log,"CnaNettyHttpClientUtil 发送异常：{}",e.getMessage(),e);
@@ -71,41 +75,39 @@ public class NettyHttpClient {
         }
     }
 
-    private String getResponse(String url, NettyHttpClientHold nettyHttpClientHold) throws InterruptedException {
-        long stime = System.currentTimeMillis();
-        while (nettyHttpClientHold.getChannelPromise() == null) {
-            if ( System.currentTimeMillis()-stime < 20000) {
+    private String getResponse(String url, NettyHttpClientHold nettyHttpClientHold){
+        if (nettyHttpClientHold.getResult()==null) {
+            synchronized (nettyHttpClientHold) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(1);
+                    nettyHttpClientHold.wait(20000);
                 } catch (InterruptedException e) {
-                    CnaLogUtil.error(log,"请求超时，无法得到服务端响应，请重试 ： {}", url);
-                    throw new RuntimeException("请求超时，无法得到服务端响应，请重试 ：" + url);
+                    CnaLogUtil.error(log,"请求超时，无法得到服务端响应，请重试 ： {}", url,e);
+                    throw new RuntimeException("请求超时，无法得到服务端响应，请重试 ：" + url,e);
                 }
-            }else {
-                CnaLogUtil.error(log,"请求超时，无法得到服务端响应，请重试 ： {}", url);
-                throw new RuntimeException("请求超时，无法得到服务端响应，请重试 ：" + url);
             }
         }
-        ChannelPromise promise = nettyHttpClientHold.getChannelPromise();
-        promise.await(3, TimeUnit.SECONDS);
+        if (nettyHttpClientHold.getResult()==null) {
+            CnaLogUtil.error(log,"请求超时，无法得到服务端响应，请重试 ： {}", url);
+            throw new RuntimeException("请求超时，无法得到服务端响应，请重试 ：" + url);
+        }
         return nettyHttpClientHold.getResult();
     }
 
-    private void sendHttpRequest(NettyHttpClientHold nettyHttpClientHold, Map<String,String> headerMap, RestFulBaseType restFulBaseType) throws InterruptedException {
-        processed(nettyHttpClientHold,null,headerMap,getHttpMethod(restFulBaseType),false);
+    private Channel sendHttpRequest(NettyHttpClientHold nettyHttpClientHold, Map<String,String> headerMap, RestFulBaseType restFulBaseType) throws InterruptedException {
+        return processed(nettyHttpClientHold,null,headerMap,getHttpMethod(restFulBaseType),false);
     }
 
-    private void sendHttpRequest(NettyHttpClientHold nettyHttpClientHold, Object dto , Map<String,String> headerMap, RestFulEntityType restFulEntityType) throws InterruptedException {
-        processed(nettyHttpClientHold,dto,headerMap,getHttpMethod(restFulEntityType),true);
+    private Channel sendHttpRequest(NettyHttpClientHold nettyHttpClientHold, Object dto , Map<String,String> headerMap, RestFulEntityType restFulEntityType) throws InterruptedException {
+        return processed(nettyHttpClientHold,dto,headerMap,getHttpMethod(restFulEntityType),true);
     }
 
-    private void processed(NettyHttpClientHold nettyHttpClientHold, Object dto , Map<String,String> headerMap , HttpMethod httpMethod, boolean entityType) throws InterruptedException {
+    private Channel processed(NettyHttpClientHold nettyHttpClientHold, Object dto , Map<String,String> headerMap , HttpMethod httpMethod, boolean entityType) throws InterruptedException {
         ChannelFuture future = nettyHttpClientHold.getBootstrap().connect(nettyHttpClientHold.getInetAddress()).sync();
         Channel client = future.channel();
         handleClientHold(nettyHttpClientHold, client);
         FullHttpRequest request = getFullHttpRequest(nettyHttpClientHold, dto, headerMap, httpMethod, entityType);
-        client.writeAndFlush(request).sync();
-        client.closeFuture().sync();
+        client.writeAndFlush(request);
+        return client;
     }
 
     private NettyHttpClientHold initClientHold(String urlStr, Map<String,Object> paramsMap) throws MalformedURLException, UnknownHostException, URISyntaxException {
@@ -115,7 +117,7 @@ public class NettyHttpClient {
         URL url = new URL(urlStr);
         String host = url.getHost();
         InetAddress address = InetAddress.getByName(host);
-        if (!host.equalsIgnoreCase(address.getHostAddress())) {
+        if (!"localhost".equalsIgnoreCase(host) && !host.equalsIgnoreCase(address.getHostAddress())) {
             //域名连接,https默认端口是443，http默认端口是80
             inetAddress = new InetSocketAddress(address, isSsl ? 443 : 80);
         } else {
