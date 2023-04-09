@@ -3,7 +3,10 @@ package cn.cnaworld.framework.infrastructure.utils.http.netty;
 
 import cn.cnaworld.framework.infrastructure.utils.log.CnaLogUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.CharsetUtil;
 import lombok.Getter;
@@ -33,13 +36,13 @@ public class NettyHttpClientHandler extends ChannelInboundHandlerAdapter {
             ByteBuf buf = response.content();
             try {
                 String result = buf.toString(CharsetUtil.UTF_8);
-                ChannelPromise channelPromise = ctx.newPromise();
-                channelPromise.setSuccess();
                 String channelId = ctx.channel().id().asLongText();
                 if (clientHoldMap.containsKey(channelId)) {
                     NettyHttpClientHold nettyHttpClientHold = clientHoldMap.get(channelId);
                     nettyHttpClientHold.setResult(result);
-                    nettyHttpClientHold.setChannelPromise(channelPromise);
+                    synchronized (nettyHttpClientHold){
+                        nettyHttpClientHold.notify();
+                    }
                     clientHoldMap.remove(channelId);
                 }else {
                     Channel channel = ctx.channel();

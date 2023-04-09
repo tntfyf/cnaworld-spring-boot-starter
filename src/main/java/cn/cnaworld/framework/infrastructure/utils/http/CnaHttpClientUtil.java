@@ -807,10 +807,10 @@ public class CnaHttpClientUtil {
 		// 从响应模型中获取响应实体
 		String result= null;
 		HttpEntity responseEntity = response.getEntity();
-		CnaLogUtil.error(log,"响应状态为 : {}" , response.getStatusLine());
+		CnaLogUtil.debug(log,"响应状态为 : {}" , response.getStatusLine());
 		if (responseEntity != null) {
 			result= EntityUtils.toString(responseEntity);
-			CnaLogUtil.error(log,"响应内容长度为 : {}， 响应内容为 : {}" , responseEntity.getContentLength() , result);
+			CnaLogUtil.debug(log,"响应内容长度为 : {}， 响应内容为 : {}" , responseEntity.getContentLength() , result);
 		}
 		return result;
 	}
