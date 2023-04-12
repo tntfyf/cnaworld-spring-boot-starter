@@ -4,16 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.cnaworld.framework</groupId>
 	<artifactId>cnaworld-spring-boot-starter</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<name>cnaworld-spring-boot-starter</name>
 	<description>cnaworld-spring-boot-starter</description>
 	<url>https://github.com/tntfyf/cnaworld-spring-boot-starter</url>
 	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
-		<cnaworld.aop.version>1.0.13</cnaworld.aop.version>
-		<cnaworld.redis.version>1.0.9</cnaworld.redis.version>
-		<cnaworld.mybatis-plus.version>1.0.8</cnaworld.mybatis-plus.version>
+		<cnaworld.aop.version>1.0.14</cnaworld.aop.version>
+		<cnaworld.redis.version>1.0.10</cnaworld.redis.version>
+		<cnaworld.mybatis-plus.version>1.0.9</cnaworld.mybatis-plus.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
