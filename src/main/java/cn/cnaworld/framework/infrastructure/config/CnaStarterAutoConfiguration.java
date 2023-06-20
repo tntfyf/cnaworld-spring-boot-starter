@@ -2,6 +2,7 @@ package cn.cnaworld.framework.infrastructure.config;
 
 
 import cn.cnaworld.framework.infrastructure.properties.commonurl.CnaworldCommonUrlProperties;
+import cn.cnaworld.framework.infrastructure.properties.repositorylazy.CnaworldRepositoryLazyProperties;
 import cn.cnaworld.framework.infrastructure.utils.resources.CnaCommonUrlUtil;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,6 @@ import org.springframework.context.annotation.Import;
  * @since 1.0
  */
 @Configuration
-@EnableConfigurationProperties({CnaworldCommonUrlProperties.class})
+@EnableConfigurationProperties({CnaworldCommonUrlProperties.class, CnaworldRepositoryLazyProperties.class})
 @Import(value = {CnaCommonUrlUtil.class})
 public class CnaStarterAutoConfiguration {}

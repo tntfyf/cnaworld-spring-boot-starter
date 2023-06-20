@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.cnaworld.framework</groupId>
 	<artifactId>cnaworld-spring-boot-starter</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<name>cnaworld-spring-boot-starter</name>
 	<description>cnaworld-spring-boot-starter</description>
 	<url>https://github.com/tntfyf/cnaworld-spring-boot-starter</url>
@@ -112,6 +112,21 @@
 			<optional>true</optional>
 			<scope>compile</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>3.3.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>expiringmap</artifactId>
+			<version>0.5.10</version>
+			<scope>compile</scope>
+		</dependency>
+
 
 	</dependencies>
 
