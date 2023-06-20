@@ -1,5 +1,5 @@
 # cnaworld spring boot starter 业务核心组件工具库
-## 1.0.4版本 
+## 1.0.5版本 
 
 作用：
 1. 集成mybatis-plus 、redis 、aop 、 log 组件库
@@ -60,6 +60,8 @@
    HttpCodeConstant：HTTP code码定义
    
    ResponseResult：统一响应包装类
+    
+   @CnaLazy ： 聚合懒加载
    
    ```
 
@@ -142,6 +144,9 @@
            post-processor: false        
      redis:
        enable: true #默认为true ，false 将关闭CnaRedisUtil实例创建
+     repository-lazy: #DDD聚合中聚合根与实体，实体与实体之间的懒加载查询
+       enable: true #总开关
+       agg-package: "cn/cnaworld/base/domain/*/model/*" #聚合包路径
    ```
 
 4. 项目启动时进行注册
@@ -162,6 +167,10 @@
    [2023-03-21 21 01:26:08.788] - [main] - [INFO] - [c.c.f.i.u.r.CnaSysConfigUtil             ]- [CnaLogUtil.java               :160]  : CnaSysConfigUtil initialized
    [2023-03-21 21 01:26:08.869] - [main] - [INFO] - [c.c.f.i.u.r.CnaCommonUrlUtil             ]- [CnaLogUtil.java               :160]  : CnaCommonUrlUtil initialized
    [2023-03-21 21 01:26:08.901] - [main] - [INFO] - [c.c.f.i.u.r.CnaRedisUtil                 ]- [CnaLogUtil.java               :160]  : CnaRedisUtil initialized
+   [2023-06-20 20 15:00:08.371] - [main] - [INFO] - [c.c.f.i.c.r.I.AggEntityLazyInitialize    ] - [AggEntityLazyInitialize.java  :46]  : cnaworld repository lazy start
+   [2023-06-20 20 15:00:08.378] - [main] - [INFO] - [c.c.f.i.c.r.I.AggEntityLazyInitialize    ] - [AggEntityLazyInitialize.java  :80]  : cnaworld repository lazy goodsExt success
+   [2023-06-20 20 15:00:08.379] - [main] - [INFO] - [c.c.f.i.c.r.I.AggEntityLazyInitialize    ] - [AggEntityLazyInitialize.java  :80]  : cnaworld repository lazy goods success
+   [2023-06-20 20 15:00:08.379] - [main] - [INFO] - [c.c.f.i.c.r.I.AggEntityLazyInitialize    ] - [AggEntityLazyInitialize.java  :86]  : cnaworld repository lazy initialized
    ```
 
 5. 调用方式
@@ -177,3 +186,88 @@
    //其他组件使用可跳转至github查阅
    
    ```
+
+6. 聚合懒加载使用样例
+
+   ```java
+   public class Order extends OrdersPo {
+       //聚合根中为实体加入懒加载注解，LazyProcessor为必填项，需要指名懒加载逻辑的执行器
+       @CnaLazy(LazyProcessor = OrderLazy.LazyGetGoods.class)
+       private Goods goods;
+   }
+   ```
+
+   ```java
+   public class Goods extends GoodsPo implements Serializable {
+       //实体中也可以懒加载实体
+       @CnaLazy(LazyProcessor = OrderLazy.LazyGetGoodsExt.class)
+       private GoodsExt goodsExt;
+   
+   }
+   ```
+
+   ```java
+   @Service
+   @Transactional
+   public class OrderRepositoryImpl implements OrderRepository {
+       //仓储实现类或者工厂类中使用懒加载方式
+       public Order getOrderLazy(Long orderId) {
+           //仓储实际调用ORM框架进行查询
+           OrdersPo ordersPo = iOrdersPoService.getById(orderId);
+           //使用懒加载对象工厂生成代理类，使用代理对象可以触发懒加载，若不需要懒加载，可以忽略此行代码
+           Order order = AggEntityLazyFactory.initAggEntity(Order.class);
+           CnaBeanCopierUtil.copy(ordersPo, order);
+           return order;
+   
+        }
+   }
+   
+   ```
+
+   ```java
+   //懒加载逻辑的执行器包装类
+   public class OrderLazy {
+       //懒加载实际逻辑执行器内部类，一个聚合下的建议写到一个包装类中，实际执行器需要实现CnaRepositoryLazyProcessor接口
+       //聚合根懒加载实体
+       public static class LazyGetGoods implements CnaRepositoryLazyProcessor {
+           //懒加载遵循调用类事务
+           @Override
+           public Object processing(Object o) {
+               //懒加载业务逻辑查询
+               IGoodsPoService iGoodsPoService= CnaSpringBeanUtil.getBean(IGoodsPoService.class);
+               Order order=(Order) o;
+               if(ObjectUtils.isNotEmpty(order.getOrderId())){
+                   QueryWrapper<GoodsPo> queryWrapper = new QueryWrapper<>();
+                   queryWrapper.eq("goods_order_id",order.getOrderId());
+                   GoodsPo goodsPo = iGoodsPoService.getOne(queryWrapper);
+                   if(ObjectUtils.isNotEmpty(goodsPo)){
+                       //PO到DO转换，返回聚合需要的DO实体
+                       return CnaBeanCopierUtil.copy(goodsPo, Goods.class);
+                   }
+               }
+               //懒加载查询一次后，不管是否结果为空都不在进行查询
+               return null;
+           }
+        //实体懒加载实体
+        public static class LazyGetGoodsExt implements CnaRepositoryLazyProcessor {
+           //懒加载遵循调用类事务
+           @Override
+           public Object processing(Object o) {
+               IGoodsExtPoService iGoodsExtPoService= CnaSpringBeanUtil.getBean(IGoodsExtPoService.class);
+               Goods goods=(Goods) o;
+               if(ObjectUtils.isNotEmpty(goods.getGoodsId())){
+                   QueryWrapper<GoodsExtPo> queryWrapper = new QueryWrapper<>();
+                   queryWrapper.eq("goods_id",goods.getGoodsId());
+                   GoodsExtPo goodsExtPo = iGoodsExtPoService.getOne(queryWrapper);
+                   if(ObjectUtils.isNotEmpty(goodsExtPo)){
+                       //PO到DO转换
+                       return CnaBeanCopierUtil.copy(goodsExtPo, GoodsExt.class);
+                   }
+               }
+               return null;
+           }
+       }
+     }
+   ```
+
+​		 
