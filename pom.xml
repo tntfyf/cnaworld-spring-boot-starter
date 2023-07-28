@@ -4,16 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.cnaworld.framework</groupId>
 	<artifactId>cnaworld-spring-boot-starter</artifactId>
-	<version>1.0.5</version>
+	<version>1.1.3</version>
 	<name>cnaworld-spring-boot-starter</name>
 	<description>cnaworld-spring-boot-starter</description>
 	<url>https://github.com/tntfyf/cnaworld-spring-boot-starter</url>
 	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
-		<cnaworld.aop.version>1.0.14</cnaworld.aop.version>
+		<cnaworld.aop.version>1.1.3</cnaworld.aop.version>
 		<cnaworld.redis.version>1.0.10</cnaworld.redis.version>
-		<cnaworld.mybatis-plus.version>1.0.9</cnaworld.mybatis-plus.version>
+		<cnaworld.mybatis-plus.version>1.1.3</cnaworld.mybatis-plus.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -210,18 +210,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<!-- 与 setting.xml 的 server 配置中的 sonatype-release 对应-->
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
