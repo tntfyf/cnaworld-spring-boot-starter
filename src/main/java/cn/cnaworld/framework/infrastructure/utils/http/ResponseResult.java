@@ -42,6 +42,7 @@ public class ResponseResult<T> {
      * @author Lucifer
      * @date 2023/3/10
      * @since 1.0.0
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> success(){
@@ -54,6 +55,7 @@ public class ResponseResult<T> {
      * @date 2023/3/10
      * @since 1.0.0
      * @param message 信息
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> success(String message){
@@ -66,6 +68,7 @@ public class ResponseResult<T> {
      * @date 2023/3/10
      * @since 1.0.0
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> success(T data) {
@@ -79,6 +82,7 @@ public class ResponseResult<T> {
      * @since 1.0.0
      * @param message 信息
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> success(String message, T data) {
@@ -90,6 +94,7 @@ public class ResponseResult<T> {
      * @author Lucifer
      * @date 2023/3/10
      * @since 1.0.0
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error() {
@@ -102,6 +107,7 @@ public class ResponseResult<T> {
      * @date 2023/3/10
      * @since 1.0.0
      * @param message 信息
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(String message) {
@@ -114,6 +120,7 @@ public class ResponseResult<T> {
      * @date 2023/3/10
      * @since 1.0.0
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(T data) {
@@ -126,6 +133,7 @@ public class ResponseResult<T> {
      * @date 2023/3/10
      * @since 1.0.0
      * @param code 响应码
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(Integer code) {
@@ -139,6 +147,7 @@ public class ResponseResult<T> {
      * @since 1.0.0
      * @param code 响应码
      * @param message 信息
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(Integer code, String message) {
@@ -152,6 +161,7 @@ public class ResponseResult<T> {
      * @since 1.0.0
      * @param message 信息
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(String message,T data) {
@@ -165,6 +175,7 @@ public class ResponseResult<T> {
      * @since 1.0.0
      * @param code 响应码
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(Integer code,T data) {
@@ -179,6 +190,7 @@ public class ResponseResult<T> {
      * @param code 响应码
      * @param message 信息
      * @param data 响应体
+     * @param <T> 数据类型
      * @return ResponseResult
      */
     public static <T> ResponseResult<T> error(Integer code, String message, T data) {

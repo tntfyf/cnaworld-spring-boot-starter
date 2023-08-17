@@ -25,13 +25,13 @@ public class CnaBeanCopierUtil {
     private static final Map<String, BeanCopier> BEAN_COPIER_MAP = new ConcurrentHashMap<>();
 
     /**
-     * List深拷贝 List对象->类
+     * List深拷贝 List对象到类
      *
      * @param sourceList 源集合
      * @param targetClass 目标集合
      * @param <S> 源对象
      * @param <T> 目标对象
-     * @return List<T> 目标集合
+     * @return List 目标集合
      */
     public static <S,T> List<T> copyList(List<S> sourceList, Class<T> targetClass) {
         // 判断空指针异常
@@ -39,17 +39,16 @@ public class CnaBeanCopierUtil {
             return null;
         }
         return sourceList.stream().map(src -> copy(src, targetClass)).collect(Collectors.toList());
-
     }
 
     /**
-     * List深拷贝 List对象->类
+     * List深拷贝 List对象到类
      *
      * @param sourceList 源集合
      * @param targetClass 目标集合
      * @param <S> 源对象
      * @param <T> 目标对象
-     * @return List<T> 目标集合
+     * @return List 目标集合
      */
     public static <S, T> List<T> copyList(List<S> sourceList, Class<T> targetClass , Converter converter) {
         // 判断空指针异常
@@ -61,7 +60,7 @@ public class CnaBeanCopierUtil {
     }
 
     /**
-     * 深拷贝 对象->类
+     * 深拷贝 对象到类
      *
      * @param source 源对象
      * @param targetClass 目标对象类
@@ -74,7 +73,7 @@ public class CnaBeanCopierUtil {
 
 
     /**
-     * 深拷贝 对象->类
+     * 深拷贝 对象到类
      *
      * @param source 源对象
      * @param targetClass 目标对象类
@@ -97,7 +96,7 @@ public class CnaBeanCopierUtil {
     }
 
     /**
-     * 深拷贝 对象->对象
+     * 深拷贝 对象到对象
      *
      * @param source 源对象
      * @param target 目标对象
@@ -108,7 +107,7 @@ public class CnaBeanCopierUtil {
 
 
     /**
-     * 深拷贝 对象->对象
+     * 深拷贝 对象到对象
      *
      * @param source 源对象
      * @param target 目标对象

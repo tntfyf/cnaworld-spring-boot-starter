@@ -136,6 +136,7 @@ public class CnaNettyHttpClientUtil {
      * @date 2023/3/9
      * @since 1.0.0
      * @param url 请求URL
+     * @param paramsMap 参数
      * @param restFulEntityType restFul协议类型
      * @return 响应报文
      */
