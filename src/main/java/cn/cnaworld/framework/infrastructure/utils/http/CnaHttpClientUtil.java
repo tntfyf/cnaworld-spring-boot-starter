@@ -233,6 +233,7 @@ public class CnaHttpClientUtil {
 	 * @date 2023/3/9
 	 * @since 1.0.0
 	 * @param url 请求URL
+	 * @param paramsMap 参数集合
 	 * @param restFulEntityType restFul协议类型
 	 * @return 响应报文
 	 */
@@ -395,6 +396,7 @@ public class CnaHttpClientUtil {
 	 * @date 2023/3/9
 	 * @since 1.0.0
 	 * @param url 请求URL
+	 * @param paramsMap 参数集合
 	 * @param restFulEntityType restFul协议类型
 	 * @return 响应报文
 	 */
@@ -603,6 +605,7 @@ public class CnaHttpClientUtil {
 	 * @param url 请求URL
 	 * @param paramsMap 请求参数
 	 * @param headerMap 请求头
+	 * @param agreement 协议
 	 * @param restFulBaseType 忽略协议
 	 * @return 响应报文
 	 */
