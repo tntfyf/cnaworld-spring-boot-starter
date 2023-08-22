@@ -1,6 +1,4 @@
 # cnaworld spring boot starter 业务核心组件工具库
-## 1.0.5版本 
-
 作用：
 1. 集成mybatis-plus 、redis 、aop 、 log 组件库
 
@@ -25,15 +23,8 @@
              <artifactId>aop</artifactId>
              <version>{latest}</version>
    </dependency>
-   
-   <!--详细用法，请参见：https://github.com/tntfyf/cnaworld-core-->
-   <dependency>
-             <groupId>cn.cnaworld.framework</groupId>
-             <artifactId>core</artifactId>
-             <version>{latest}</version>
-   </dependency>
    ```
-
+   
 2. 提供常用工具组件库，所有工具方法均可直接静态调用，无需注入。
 
    ```
@@ -102,6 +93,7 @@
          - path-name: cn.cnaworld.framework.infrastructure.config
            log-level: warn
      mybatis-plus:
+       auto-field-encrypt: true #使用对象进行CRUD时，若字段上存在@CnaFieldEncrypt注解则会自动加密解密
        auto-insert-fill: true #数据初始化时默认填充，insert时，自动获取fill-strategy-field 中的属性进行填充。
        function-extension: true #扩展逻辑删除相关方法，提供逻辑恢复和直接删除扩展方法。默认true开启。
        snow-flake: true #提供16位雪花ID实现。默认true开启。
@@ -113,7 +105,11 @@
          - field-name: "updateTimeDb"
            field-class: java.time.LocalDateTime #填充值处理器，实现FieldProcessor的getFieldValue方法，返回值作为属性填充值。
          - field-name: "deletedDb"
-           field-value: false #填充值        
+           field-value: false #填充值    
+       field-encrypt: #使用对象进行CRUD时，若字段上存在@CnaFieldEncrypt注解则会自动加密解密
+         algorithm: aes #String 类型字段加密算法
+         keys: Ssadasa123dsfsda21sdasd #加密密钥
+         encrypt-algorithm-processor: cn.cnaworld.framework.infrastructure.component.mybatisplus.processor.stringprocessor.impl.AESEncryptProcessor #自定义实现处理器 
      aop: 
        #@CnaAopLog默认实现开关，默认为true,可关闭。
        #若切面列表出现@CnaAopLog默认表达式，则以下方配置为准，但依然受此开关影响
@@ -161,6 +157,7 @@
    [2023-03-21 21 01:18:51.461] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ]- [CnaLogUtil.java               :160]  : cnaworld mybatis-plus optimistic-locker initialized
    [2023-03-21 21 01:18:51.467] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ]- [CnaLogUtil.java               :160]  : cnaworld mybatis-plus update-optimistic-locker-field initialized
    [2023-03-21 21 01:18:51.506] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ]- [CnaLogUtil.java               :160]  : cnaworld mybatis-plus auto-insert-fill initialized
+   [2023-08-22 22 16:41:48.210] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ] - [MybatisPlusConfig.java        :57]  : cnaworld mybatis-plus auto-field-encrypt initialized
    [2023-03-21 21 01:18:51.519] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ]- [CnaLogUtil.java               :160]  : cnaworld mybatis-plus extend method initialized
    [2023-03-21 21 01:18:51.526] - [main] - [INFO] - [c.c.f.i.c.m.c.MybatisPlusConfig          ]- [CnaLogUtil.java               :160]  : cnaworld mybatis-plus 16-snowflake initialized
    [2023-03-21 21 01:26:08.784] - [main] - [INFO] - [c.c.f.i.u.l.CnaLogUtil                   ]- [CnaLogUtil.java               :35]  : CnaLogUtil initialized
