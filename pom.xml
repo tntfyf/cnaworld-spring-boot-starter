@@ -4,14 +4,13 @@
 	<parent>
 		<groupId>cn.cnaworld.framework</groupId>
 		<artifactId>cnaworld-framework</artifactId>
-		<version>1.1.5</version>
+		<version>1.1.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.cnaworld.framework</groupId>
 	<artifactId>cnaworld-spring-boot-starter</artifactId>
-	<version>1.1.5</version>
 	<name>cnaworld-spring-boot-starter</name>
 	<description>cnaworld-spring-boot-starter</description>
 	<url>https://github.com/tntfyf/cnaworld-spring-boot-starter</url>
@@ -61,7 +60,6 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.89.Final</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -74,14 +72,12 @@
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
-			<version>3.3.0</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.jodah</groupId>
 			<artifactId>expiringmap</artifactId>
-			<version>0.5.10</version>
 			<scope>compile</scope>
 		</dependency>
 
